@@ -1,0 +1,32 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "service",
+    srcs = ["router.go"],
+    importpath = "backend/service",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//drivers/LinkDriver",
+        "//service/models",
+        "@com_github_gin_gonic_gin//:gin",
+    ],
+)
+
+go_library(
+    name = "app_service",
+    srcs = [
+        "handler.go",
+        "middleware.go",
+        "routes.go",
+    ],
+    importpath = "backend/app_service",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//app_service/models",
+        "//constants",
+        "//drivers/LinkDriver",
+        "//helpers",
+        "//models",
+        "@com_github_gin_gonic_gin//:gin",
+    ],
+)
