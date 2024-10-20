@@ -1,0 +1,19 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "member_service",
+    srcs = [
+        "handler.go",
+        "routes.go",
+    ],
+    importpath = "backend/member_service",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//drivers/member_driver",
+        "//helpers",
+        "//models",
+        "@com_github_gin_gonic_gin//:gin",
+        "@org_golang_x_crypto//bcrypt",
+        "@org_mongodb_go_mongo_driver//bson/primitive",
+    ],
+)
