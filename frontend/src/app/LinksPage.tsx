@@ -1,0 +1,114 @@
+import * as React from 'react';
+import { alpha } from '@mui/material/styles';
+import CssBaseline from '@mui/material/CssBaseline';
+import Box from '@mui/material/Box';
+import Stack from '@mui/material/Stack';
+import getSignInSideTheme from './theme/getSignInSideTheme';
+import { createTheme, ThemeProvider, PaletteMode } from '@mui/material/styles';
+import SideMenu from './SideMenu';
+import MainGrid from './MainGrid';
+import axios from 'axios';
+import Cookies from 'js-cookie';
+import CustomCard from './CustomCard';
+import { 
+	Button,
+	Typography,
+	Divider
+ } from '@mui/material';
+
+export default function Dashboard(props: { disableCustomTheme?: boolean }) {
+	const [mode, setMode] = React.useState<PaletteMode>('light');
+	const [loggedIn, setLoggedIn] = React.useState(false);
+	const [username, setUsername] = React.useState('');
+	const [email, setEmail] = React.useState('');
+	const [links, setLinks] = React.useState([]);
+	const [linksError, setLinksError] = React.useState('');
+	const SignInSideTheme = createTheme(getSignInSideTheme(mode));
+	// This code only runs on the client side, to determine the system color preference
+	React.useEffect(() => {
+	  // Check if there is a preferred mode in localStorage
+	const fetchMemberInfo = async () => {
+
+		const authToken = Cookies.get('AuthToken');
+		axios.get('http://localhost:3000/app/member-info', {
+			headers: {
+				AuthToken: authToken,
+			},
+		}).then(response => {
+			setUsername(response.data.username);
+			setEmail(response.data.email);
+			setLoggedIn(true);
+		}).catch(error => {
+			window.location.href = '/sign-in';
+		});
+	};
+
+	const fetchMemberLinks = async () => {
+		const authToken = Cookies.get('AuthToken');
+		axios.get('http://localhost:3000/app/member-links', {
+			headers: {
+				AuthToken: authToken,
+			},
+		}).then(response => {
+			console.log(response);
+			console.log("aici");
+			setLinks(response.data.links);
+		}).catch(error => {
+			setLinksError('Could not fetch links');
+		});
+	};
+
+	fetchMemberInfo();
+	fetchMemberLinks();
+	  const systemPrefersDark = window.matchMedia(
+		  '(prefers-color-scheme: dark)',
+		).matches;
+		setMode(systemPrefersDark ? 'dark' : 'light');
+	  }, []);
+  return (
+    <ThemeProvider theme={SignInSideTheme}>
+      <CssBaseline enableColorScheme />
+      <Box sx={{ display: 'flex' }}>
+        {/* Main content */}
+		<SideMenu username={username} email={email}/>
+        <Box
+          component="main"
+          sx={(theme) => ({
+            flexGrow: 1,
+            backgroundColor: theme.vars
+              ? `rgba(${theme.vars.palette.background.defaultChannel} / 1)`
+              : alpha(theme.palette.background.default, 1),
+            overflow: 'auto',
+          })}
+        >
+          <Stack
+            spacing={2}
+            sx={{
+              alignItems: 'center',
+              mx: 3,
+              pb: 5,
+              mt: { xs: 8, md: 1 },
+            }}
+          >
+			<Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width:'100%', maxWidth:'600px'}}>
+				<Typography variant="h3" component="div">
+					Links Page
+				</Typography>
+				<Button variant="contained" size="small">
+					Create Link
+				</Button>
+			</Box>
+			<Divider />
+			{links === undefined ? (
+				<p>No links available</p>
+			) : (
+				links.map((link, index) => (
+					<CustomCard key={index} title={link.title} link_id={link.id} original_url={link.referenced_link} />
+				))
+			)}
+          </Stack>
+        </Box>
+      </Box>
+    </ThemeProvider>
+  );
+}
