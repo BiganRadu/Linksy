@@ -1,0 +1,15 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "models",
+    srcs = [
+        "Link.go",
+        "Member.go",
+    ],
+    importpath = "backend/models",
+    visibility = ["//visibility:public"],
+    deps = [
+        "@com_github_dgrijalva_jwt_go//:jwt-go",
+        "@org_mongodb_go_mongo_driver//bson/primitive",
+    ],
+)
