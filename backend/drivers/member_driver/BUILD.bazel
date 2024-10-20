@@ -1,0 +1,16 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "member_driver",
+    srcs = [
+        "member_driver.go",
+        "mongo_member_driver.go",
+    ],
+    importpath = "backend/drivers/member_driver",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//models",
+        "@org_mongodb_go_mongo_driver//mongo",
+        "@org_mongodb_go_mongo_driver//mongo/options",
+    ],
+)
