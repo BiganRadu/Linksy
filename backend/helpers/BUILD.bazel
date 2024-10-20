@@ -1,0 +1,12 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "helpers",
+    srcs = ["token_helper.go"],
+    importpath = "backend/helpers",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//models",
+        "@com_github_dgrijalva_jwt_go//:jwt-go",
+    ],
+)
