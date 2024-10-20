@@ -9,6 +9,15 @@ go_library(
     srcs = ["main.go"],
     importpath = "backend",
     visibility = ["//visibility:private"],
+    deps = [
+        "//app_service",
+        "//drivers/LinkDriver",
+        "//drivers/member_driver",
+        "//helpers",
+        "//member_service",
+        "@com_github_gin_contrib_cors//:cors",
+        "@com_github_gin_gonic_gin//:gin",
+    ],
 )
 
 go_binary(
