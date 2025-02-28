@@ -1,9 +1,10 @@
 package app_service
 
 import (
+	"backend/app_service/helpers"
 	internal_models "backend/app_service/models"
-	"backend/constants"
 	"backend/models"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"time"
 )
@@ -30,7 +31,7 @@ func (a *AppHandler) GetRedirect(c *gin.Context) {
 		return
 	}
 
-	if !IsIpAllowed(linkRequest.Ip, link) {
+	if !helpers.IsIpAllowed(linkRequest.Ip, link) {
 		c.JSON(403, gin.H{"error": "This ip is not allowed to access this link"})
 		return
 	}
@@ -60,6 +61,23 @@ func (a *AppHandler) GetMemberInfo(c *gin.Context) {
 	c.JSON(200, memberInfo)
 }
 
+func (a *AppHandler) GetLink(c *gin.Context) {
+	linkID := c.Query("link_id")
+
+	link, err := a.linkDriver.GetLinkByID(linkID)
+	if err != nil {
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+
+	if link == nil {
+		c.JSON(404, gin.H{"error": "Link not found"})
+		return
+	}
+
+	c.JSON(200, link)
+}
+
 func (a *AppHandler) GetMemberLinks(c *gin.Context) {
 	email := c.GetString("email")
 
@@ -74,7 +92,9 @@ func (a *AppHandler) GetMemberLinks(c *gin.Context) {
 		memberLinks = append(memberLinks, &internal_models.LinkDetails{
 			ID:             link.ID,
 			Title:          link.Title,
+			Icon:           link.Icon,
 			ReferencedLink: link.ReferencedLink,
+			CreatedAt:      link.CreatedAt,
 		})
 	}
 
@@ -83,26 +103,88 @@ func (a *AppHandler) GetMemberLinks(c *gin.Context) {
 	})
 }
 
-func IsIpAllowed(Ip int32, Link *models.Link) bool {
-	switch Link.AccessMode {
-	case constants.LinkAccessModes.Default:
-		return true
-	case constants.LinkAccessModes.IpWhiteList:
-		for _, ip := range Link.AllowedIps {
-			if Ip == ip {
-				return true
-			}
-		}
-		return false
-	case constants.LinkAccessModes.IpBlackList:
-		for _, ip := range Link.AllowedIps {
-			if Ip == ip {
-				return false
-			}
-		}
-		return true
+func (a *AppHandler) CreateLink(c *gin.Context) {
+	var link models.Link
+	if err := c.BindJSON(&link); err != nil {
+		c.JSON(400, gin.H{"error": err.Error()})
+		fmt.Println(err)
+		return
 	}
-	return false
+
+	link.MemberEmail = c.GetString("email")
+	link.ID = helpers.RandomString(6)
+	link.CreatedAt = a.nowFunc().Unix()
+
+	title, icon, err := helpers.GetTitleAndIcon(link.ReferencedLink)
+	if err != nil {
+		c.JSON(400, gin.H{"error": "Failed to fetch details about the referenced link"})
+		return
+	}
+	if link.Title == "" {
+		link.Title = title
+	}
+	link.Icon = icon
+
+	_, err = a.linkDriver.GetLinkByID(link.ID)
+	for err == nil {
+		link.ID = helpers.RandomString(6)
+		_, err = a.linkDriver.GetLinkByID(link.ID)
+	}
+
+	err = a.linkDriver.UpsertLink(&link)
+	if err != nil {
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(200, nil)
+}
+
+func (a *AppHandler) UpdateLink(c *gin.Context) {
+	var link models.Link
+	if err := c.BindJSON(&link); err != nil {
+		c.JSON(400, gin.H{"error": err.Error()})
+		return
+	}
+
+	currentSavedLink, err := a.linkDriver.GetLinkByID(link.ID)
+	if err != nil {
+		c.JSON(500, gin.H{"error": "Invalid link"})
+		return
+	}
+
+	link.CreatedAt = currentSavedLink.CreatedAt
+	link.MemberEmail = currentSavedLink.MemberEmail
+
+	title, icon, err := helpers.GetTitleAndIcon(link.ReferencedLink)
+	if err != nil {
+		c.JSON(400, gin.H{"error": "Failed to fetch details about the referenced link"})
+		return
+	}
+	if link.Title == "" {
+		link.Title = title
+	}
+	link.Icon = icon
+
+	err = a.linkDriver.UpsertLink(&link)
+	if err != nil {
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(200, nil)
+}
+
+func (a *AppHandler) DeleteLink(c *gin.Context) {
+	linkID := c.Query("link_id")
+
+	err := a.linkDriver.DeleteLink(linkID)
+	if err != nil {
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(200, nil)
 }
 
 func (a *AppHandler) AddAccessEntry(req *internal_models.RedirectLinkRequest, Link *models.Link) {

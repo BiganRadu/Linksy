@@ -22,8 +22,8 @@ go_library(
     importpath = "backend/app_service",
     visibility = ["//visibility:public"],
     deps = [
+        "//app_service/helpers",
         "//app_service/models",
-        "//constants",
         "//drivers/LinkDriver",
         "//helpers",
         "//models",
