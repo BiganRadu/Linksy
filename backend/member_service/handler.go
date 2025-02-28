@@ -26,4 +26,5 @@ func NewMemberHandler(memberDriver member_driver.MemberDriver, tokenHelper *help
 func (m *MemberHandler) Routes(group *gin.RouterGroup) {
 	group.POST("/register", m.Register)
 	group.POST("/login", m.Login)
+	group.GET("/logout", m.Logout)
 }
