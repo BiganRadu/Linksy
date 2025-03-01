@@ -1,0 +1,12 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "helpers",
+    srcs = ["helpers.go"],
+    importpath = "backend/app_service/helpers",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//constants",
+        "//models",
+    ],
+)
