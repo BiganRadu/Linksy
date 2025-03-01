@@ -11,6 +11,8 @@ import MenuContent from './MenuContent';
 import OptionsMenu from './OptionsMenu';
 import IconButton from '@mui/material/IconButton';
 import LogoutIcon from '@mui/icons-material/Logout';
+import axios from 'axios';
+import Cookies from 'js-cookie';
 
 const drawerWidth = 240;
 
@@ -25,12 +27,31 @@ const Drawer = styled(MuiDrawer)({
   },
 });
 
-interface MemberInfo {
+interface SideMenuInfo {
 	username: string;
 	email: string;
+	selectedItem: string;
 }
 
-export default function SideMenu({ username, email } : MemberInfo) {
+const logout = async () => {
+	try {
+		const response = await axios.get('http://localhost:3000/member/logout', {
+			headers: {
+				'AuthToken': Cookies.get('AuthToken')
+			}
+		});
+
+		if (response.status === 200) {
+			Cookies.remove('AuthToken');
+			console.log('Logged out successfully');
+			window.location.href = '/sign-in';
+		}
+	} catch (error) {
+		console.error('Error logging out:', error);
+	}
+}
+
+export default function SideMenu({ username, email, selectedItem} : SideMenuInfo) {
   return (
     <Drawer
       variant="permanent"
@@ -41,7 +62,7 @@ export default function SideMenu({ username, email } : MemberInfo) {
         },
       }}
     >
-      <MenuContent />
+      <MenuContent selectedItem= {selectedItem}/>
       <Stack
         direction="row"
         sx={{
@@ -67,7 +88,7 @@ export default function SideMenu({ username, email } : MemberInfo) {
           </Typography>
         </Box>
 
-		<IconButton size="small" edge="end" color="inherit">
+		<IconButton size="small" edge="end" color="inherit" onClick={logout}>
 			<LogoutIcon />
 		</IconButton>
       </Stack>
