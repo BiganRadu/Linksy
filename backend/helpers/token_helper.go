@@ -16,13 +16,13 @@ func NewTokenHelper(secretKey string) *TokenHelper {
 	}
 }
 
-func (t *TokenHelper) GenerateToken(email, username string, createdAt int64) (string, error) {
+func (t *TokenHelper) GenerateToken(email, username string, createdAt int64, expireAfter time.Duration) (string, error) {
 	claims := &models.MemberSignedDetails{
 		Email:     email,
 		Username:  username,
 		CreatedAt: createdAt,
 		StandardClaims: jwt.StandardClaims{
-			ExpiresAt: time.Now().Add(time.Hour * 24).Unix(),
+			ExpiresAt: time.Now().Add(expireAfter).Unix(),
 		},
 	}
 

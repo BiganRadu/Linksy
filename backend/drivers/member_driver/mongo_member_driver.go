@@ -71,6 +71,14 @@ func (m *MongoMemberDriver) UpsertMember(Member *models.Member) error {
 	return err
 }
 
+func (m *MongoMemberDriver) SetTokenForMember(Email, Token string) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	_, err := m.collection.UpdateOne(ctx, map[string]string{"email": Email}, map[string]string{"token": Token})
+	return err
+}
+
 func (m *MongoMemberDriver) DeleteMember(Email string) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
