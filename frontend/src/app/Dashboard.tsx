@@ -46,7 +46,7 @@ export default function Dashboard(props: { disableCustomTheme?: boolean }) {
       <CssBaseline enableColorScheme />
       <Box sx={{ display: 'flex' }}>
         {/* Main content */}
-		<SideMenu username={username} email={email}/>
+		<SideMenu username={username} email={email} selectedItem='Home'/>
         <Box
           component="main"
           sx={(theme) => ({
