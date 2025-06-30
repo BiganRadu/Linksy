@@ -58,6 +58,8 @@ export default function SignInCard() {
     if (emailError || passwordError) {
       return;
     }
+
+	// Parse the form data
     const data = new FormData(event.currentTarget);
 	const email = data.get('email');
 	const password = data.get('password');
@@ -65,7 +67,7 @@ export default function SignInCard() {
 		.then(response => {
 			const token = response.data.token;
 			Cookies.set('AuthToken', token, { expires: 1 });
-			// Redirect or perform any other actions after successful sign-in
+			window.location.href = '/app/';
 		})
 		.catch(error => {
 			setSignInError(true);
@@ -79,6 +81,7 @@ export default function SignInCard() {
 
     let isValid = true;
 
+	// Check if the email is valid
     if (!email.value || !/\S+@\S+\.\S+/.test(email.value)) {
       setEmailError(true);
       setEmailErrorMessage('Please enter a valid email address.');
@@ -88,6 +91,7 @@ export default function SignInCard() {
       setEmailErrorMessage('');
     }
 
+	// Check if the password is valid
     if (!password.value || password.value.length < 6) {
       setPasswordError(true);
       setPasswordErrorMessage('Password must be at least 6 characters long.');
