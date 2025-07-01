@@ -12,6 +12,7 @@ export default function MainGrid() {
 	const handleRedirect = (category: string) => {
 		window.location.href = '/app/' + category;
 	}
+	
   return (
     <Box sx={{ width: '100%', maxWidth: '800px', paddingTop: 4}}>
       <Typography component="h2" variant="h3" sx={{ mb: 2 }}>

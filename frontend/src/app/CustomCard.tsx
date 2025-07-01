@@ -2,7 +2,6 @@ import React from 'react';
 import {
   Card,
   CardContent,
-  CardActions,
   Typography,
   Button,
   IconButton,
@@ -56,7 +55,7 @@ const CustomCard: React.FC<LinkCardInfo> = ({ title, link_id, original_url, icon
 			{/* Card content */}
 			<Box sx={{ flex: 1 }}>
 			  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-				<Typography variant="h6" component="div">
+				<Typography variant="h6" component="div" maxWidth={300}>
 				  {title}
 				</Typography>
 				<Box>
@@ -89,6 +88,5 @@ const CustomCard: React.FC<LinkCardInfo> = ({ title, link_id, original_url, icon
 	  </Card>
 	);
 };
-  
 
 export default CustomCard;

@@ -10,26 +10,23 @@ import FormLabel from '@mui/material/FormLabel';
 import FormControl from '@mui/material/FormControl';
 import TextareaAutosize from '@mui/material/TextareaAutosize';
 import SideMenu from './SideMenu';
-import MainGrid from './MainGrid';
 import axios from 'axios';
 import Cookies from 'js-cookie';
-import CustomCard from './CustomCard';
+
 import { 
 	Button,
 	Typography,
-	Divider
  } from '@mui/material';
 
 export default function Dashboard(props: { disableCustomTheme?: boolean }) {
 	const [mode, setMode] = React.useState<PaletteMode>('light');
-	const [loggedIn, setLoggedIn] = React.useState(false);
 	const [username, setUsername] = React.useState('');
 	const [email, setEmail] = React.useState('');
 	const [destinationError, setDestinationError] = React.useState(false);
 	const [destinationErrorMessage, setDestinationErrorMessage] = React.useState('');
 	const [titleError, setTitleError] = React.useState(false);
 	const [titleErrorMessage, setTitleErrorMessage] = React.useState('');
-	const [category, setCategory] = React.useState('option1');
+	const [category, setCategory] = React.useState('anyone');
 	const [linkError, setLinkError] = React.useState(false);
 	const [linkErrorMessage, setLinkErrorMessage] = React.useState('');
 	const [ipError, setIpError] = React.useState(false);
@@ -41,15 +38,16 @@ export default function Dashboard(props: { disableCustomTheme?: boolean }) {
 		if (destinationError || titleError || ipError) {
 		  return;
 		}
-		console.log('submit');
 
 		const data = new FormData(event.currentTarget);
 		const referenced_link = data.get('destination');
 		const title = data.get('title');
 		const category = data.get('category');
+		const addQrCode = data.get('addQrCode') === 'on' ? true : false;
 		const allowed_ips = [];
 		const black_listed_ips = [];
-		if (category === 'option2') {
+		
+		if (category === "blacklist") {
 			const blacklisted = data.get('blacklisted');
 			
 			const ipToInt = (ip: string) => {
@@ -62,7 +60,7 @@ export default function Dashboard(props: { disableCustomTheme?: boolean }) {
 			});
 		}
 
-		if (category === 'option3') {
+		if (category === 'whitelist') {
 			const whitelisted = data.get('whitelisted');
 
 			const ipToInt = (ip: string) => {
@@ -76,9 +74,9 @@ export default function Dashboard(props: { disableCustomTheme?: boolean }) {
 		}
 
 		let access_mode = 0;
-		if (category === 'option2') {
+		if (category === "blacklist") {
 			access_mode = 2;
-		} else if (category === 'option3') {
+		} else if (category === 'whitelist') {
 			access_mode = 1;
 		}
 
@@ -89,7 +87,8 @@ export default function Dashboard(props: { disableCustomTheme?: boolean }) {
 		'title' : title,
 		'allowed_ips' : allowed_ips,
 		'black_listed_ips' : black_listed_ips,
-		'access_mode' : access_mode
+		'access_mode' : access_mode,
+		"has_qr": addQrCode
 		}, {
 			headers: {
 				AuthToken: authToken,
@@ -120,6 +119,7 @@ export default function Dashboard(props: { disableCustomTheme?: boolean }) {
 			'(\\?[;&a-z\\d%_.~+=-]*)?'+ // query string
 			'(\\#[-a-z\\d_]*)?$','i'); // fragment locator
 
+		// Validate the destination URL
 		if (!urlPattern.test(destination.value)) {
 			setDestinationError(true);
 			setDestinationErrorMessage('Invalid URL');
@@ -129,6 +129,7 @@ export default function Dashboard(props: { disableCustomTheme?: boolean }) {
 			setDestinationErrorMessage('');
 		}
 
+		// Validate the title
 		if (title.value.length > 256) {
 			setTitleError(true);
 			setTitleErrorMessage('Title must be less than 256 characters');
@@ -138,7 +139,8 @@ export default function Dashboard(props: { disableCustomTheme?: boolean }) {
 			setTitleErrorMessage('');
 		}
 
-		if (category === 'option2') {
+		// Validate the blacklist category inputs
+		if (category === "blacklist") {
 			const blacklisted = document.getElementById('blacklisted') as HTMLInputElement;
 			const ipPattern = new RegExp('^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$');
 			
@@ -158,7 +160,8 @@ export default function Dashboard(props: { disableCustomTheme?: boolean }) {
 			}
 		}
 
-		if (category === 'option3') {
+		// Validate the whitelist category inputs
+		if (category === 'whitelist') {
 			const whitelisted = document.getElementById('whitelisted') as HTMLInputElement;
 			const ipPattern = new RegExp('^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$');
 			
@@ -193,7 +196,6 @@ export default function Dashboard(props: { disableCustomTheme?: boolean }) {
 		}).then(response => {
 			setUsername(response.data.username);
 			setEmail(response.data.email);
-			setLoggedIn(true);
 		}).catch(error => {
 			window.location.href = '/sign-in';
 		});
@@ -205,6 +207,7 @@ export default function Dashboard(props: { disableCustomTheme?: boolean }) {
 		).matches;
 		setMode(systemPrefersDark ? 'dark' : 'light');
 	  }, []);
+
   return (
     <ThemeProvider theme={SignInSideTheme}>
       <CssBaseline enableColorScheme />
@@ -239,7 +242,7 @@ export default function Dashboard(props: { disableCustomTheme?: boolean }) {
         component="form"
         onSubmit={handleSubmit}
         noValidate
-        sx={{ display: 'flex', flexDirection: 'column', width: '100%', gap: 2, maxWidth: '600px' }}
+        sx={{ display: 'flex', flexDirection: 'column', width: '100%', gap: 2, maxWidth: '600px'}}
       >
         <FormControl>
           <FormLabel htmlFor="destination">Destination</FormLabel>
@@ -288,12 +291,12 @@ export default function Dashboard(props: { disableCustomTheme?: boolean }) {
 				}}
 				onChange={(event) => setCategory(event.target.value)}
 			>
-				<option value="option1">Accessible to anyone</option>
-				<option value="option2">Blocked for blacklisted ips</option>
-				<option value="option3">Only allowed to whitelisted ips</option>
+				<option value="anyone">Accessible to anyone</option>
+				<option value="blacklist">Blocked for blacklisted ips</option>
+				<option value="whitelist">Only allowed to whitelisted ips</option>
 			</TextField>
 		</FormControl>
-		{category === 'option2' && (
+		{category === "blacklist" && (
 			<>
 			<FormControl>
 				<FormLabel htmlFor="blacklisted">BlackListed Ips</FormLabel>
@@ -309,7 +312,7 @@ export default function Dashboard(props: { disableCustomTheme?: boolean }) {
 			</>
 		)}
 
-		{category === 'option3' && (
+		{category === 'whitelist' && (
 			<>
 			<FormControl>
 				<FormLabel htmlFor="whitelisted">WhiteListed Ips</FormLabel>
@@ -324,6 +327,19 @@ export default function Dashboard(props: { disableCustomTheme?: boolean }) {
 			</Typography>
 			</>
 		)}
+		<FormControl>
+			<Box sx={{ display: 'flex'}}>
+				<input
+					type="checkbox"
+					id="addQrCode"
+					name="addQrCode"
+					style={{ marginRight: 8 }}
+				/>
+				<FormLabel htmlFor="addQrCode" sx={{ mb: 0 }}>
+					Add QR Code
+				</FormLabel>
+			</Box>
+		</FormControl>
 		<Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
 			<Button variant="outlined" color="secondary" onClick={redirectToLinks}>
 				Cancel
