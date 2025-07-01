@@ -441,6 +441,13 @@ go_repository(
     version = "v3.2.0+incompatible",
 )
 
+go_repository(
+    name = "com_github_aws_aws_sdk_go_v2",
+    importpath = "github.com/aws/aws-sdk-go-v2",
+    sum = "h1:mJoei2CxPutQVxaATCzDUjcZEjVRdpsiiXi2o38yqWM=",
+    version = "v1.36.3",
+)
+
 load("//:deps.bzl", "go_dependencies")
 
 # gazelle:repository_macro deps.bzl%go_dependencies
