@@ -11,6 +11,8 @@ type Link struct {
 	AccessEntries  []AccessEntry `bson:"access_entries" json:"access_entries"`
 	ReferencedLink string        `bson:"referenced_link" json:"referenced_link"`
 	CreatedAt      int64         `bson:"created_at" json:"created_at"`
+	HasQR          bool          `bson:"has_qr" json:"has_qr"`
+	QRLink         string        `bson:"qr_link" json:"qr_link"`
 }
 
 type AccessEntry struct {

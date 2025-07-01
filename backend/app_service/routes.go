@@ -103,6 +103,32 @@ func (a *AppHandler) GetMemberLinks(c *gin.Context) {
 	})
 }
 
+func (a *AppHandler) GetMemberQRs(c *gin.Context) {
+	email := c.GetString("email")
+
+	links, err := a.linkDriver.GetQRsForMember(email)
+	if err != nil {
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+
+	var memberLinks []*internal_models.LinkDetails
+	for _, link := range links {
+		memberLinks = append(memberLinks, &internal_models.LinkDetails{
+			ID:             link.ID,
+			Title:          link.Title,
+			Icon:           link.Icon,
+			ReferencedLink: link.ReferencedLink,
+			CreatedAt:      link.CreatedAt,
+			QRPicture:      link.QRLink,
+		})
+	}
+
+	c.JSON(200, internal_models.MemberLinksResponse{
+		Links: memberLinks,
+	})
+}
+
 func (a *AppHandler) CreateLink(c *gin.Context) {
 	var link models.Link
 	if err := c.BindJSON(&link); err != nil {
@@ -125,10 +151,20 @@ func (a *AppHandler) CreateLink(c *gin.Context) {
 	}
 	link.Icon = icon
 
+	// Ensure the link ID is unique
 	_, err = a.linkDriver.GetLinkByID(link.ID)
 	for err == nil {
 		link.ID = helpers.RandomString(6)
 		_, err = a.linkDriver.GetLinkByID(link.ID)
+	}
+
+	if link.HasQR == true {
+		qrLink, err := a.CreateQr(link.ID)
+		if err != nil {
+			c.JSON(500, gin.H{"error": "Failed to create QR code"})
+			return
+		}
+		link.QRLink = qrLink
 	}
 
 	err = a.linkDriver.UpsertLink(&link)
@@ -155,6 +191,9 @@ func (a *AppHandler) UpdateLink(c *gin.Context) {
 
 	link.CreatedAt = currentSavedLink.CreatedAt
 	link.MemberEmail = currentSavedLink.MemberEmail
+	link.HasQR = currentSavedLink.HasQR
+	link.QRLink = currentSavedLink.QRLink
+	link.AccessEntries = currentSavedLink.AccessEntries
 
 	title, icon, err := helpers.GetTitleAndIcon(link.ReferencedLink)
 	if err != nil {
@@ -185,6 +224,36 @@ func (a *AppHandler) DeleteLink(c *gin.Context) {
 	}
 
 	c.JSON(200, nil)
+}
+
+func (a *AppHandler) DeleteQr(c *gin.Context) {
+	linkID := c.Query("link_id")
+
+	link, err := a.linkDriver.GetLinkByID(linkID)
+	if err != nil {
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+
+	link.QRLink = ""
+	link.HasQR = false
+	err = a.linkDriver.UpsertLink(link)
+	if err != nil {
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(200, nil)
+}
+
+func (a *AppHandler) CreateQr(ID string) (string, error) {
+	//linkId := helpers.RandomString(6)
+	err := helpers.GenerateQRCode("bit.ly/"+ID, ID+".png", 256)
+	if err != nil {
+		return "", err
+	}
+
+	return helpers.UploadToS3(a.awsClient, a.s3Bucket, "qrcodes/"+ID+".png", "/home/raduzew/CS2023-2027/GO/Linksy/backend/pictures/"+ID+".png")
 }
 
 func (a *AppHandler) AddAccessEntry(req *internal_models.RedirectLinkRequest, Link *models.Link) {

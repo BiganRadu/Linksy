@@ -3,11 +3,16 @@ package helpers
 import (
 	"backend/constants"
 	"backend/models"
+	"context"
 	"crypto/rand"
 	"fmt"
+	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/service/s3"
+	"github.com/skip2/go-qrcode"
 	"io"
 	"math/big"
 	"net/http"
+	"os"
 	"regexp"
 	"strings"
 )
@@ -87,4 +92,35 @@ func IsIpAllowed(Ip uint32, Link *models.Link) bool {
 		return true
 	}
 	return false
+}
+
+func GenerateQRCode(text, filename string, size int) error {
+	wd, _ := os.Getwd()
+	fmt.Println("Current path: ", wd)
+	err := qrcode.WriteFile(text, qrcode.Medium, size, "/home/raduzew/CS2023-2027/GO/Linksy/backend/pictures/"+filename)
+	fmt.Println("QR code saved to", filename)
+	if err != nil {
+		fmt.Println("Failed to generate QR code: %v", err)
+		return err
+	}
+	return nil
+}
+
+func UploadToS3(awsClient *s3.Client, bucketName, objectKey, filePath string) (string, error) {
+	file, err := os.Open(filePath)
+	if err != nil {
+		return "", fmt.Errorf("failed to open file: %w", err)
+	}
+	defer file.Close()
+
+	_, err = awsClient.PutObject(context.TODO(), &s3.PutObjectInput{
+		Bucket: aws.String(bucketName),
+		Key:    aws.String(objectKey),
+		Body:   file,
+	})
+	if err != nil {
+		return "", fmt.Errorf("upload failed: %w", err)
+	}
+
+	return fmt.Sprintf("https://%s.s3.amazonaws.com/%s", bucketName, objectKey), nil
 }

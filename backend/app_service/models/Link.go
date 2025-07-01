@@ -17,4 +17,5 @@ type LinkDetails struct {
 	Icon           string `json:"icon"`
 	ReferencedLink string `json:"referenced_link"`
 	CreatedAt      int64  `json:"created_at"`
+	QRPicture      string `json:"qr_picture"`
 }

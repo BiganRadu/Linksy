@@ -6,7 +6,11 @@ import (
 	"backend/drivers/member_driver"
 	"backend/helpers"
 	"backend/member_service"
+	"context"
 	"fmt"
+	"github.com/aws/aws-sdk-go-v2/config"
+	"github.com/aws/aws-sdk-go-v2/credentials"
+	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"os"
@@ -15,6 +19,23 @@ import (
 func main() {
 	mongoConnectionString := os.Getenv("MONGO_CONNECTION_STRING")
 	jwtSecretKey := os.Getenv("JWT_SECRET_KEY")
+
+	// Read AWS credentials from environment variables
+	accessKey := os.Getenv("AWS_ACCESS_KEY_ID")
+	secretKey := os.Getenv("AWS_SECRET_ACCESS_KEY")
+	region := os.Getenv("AWS_REGION")
+	bucket := os.Getenv("AWS_BUCKET_NAME")
+
+	cfg, err := config.LoadDefaultConfig(context.TODO(),
+		config.WithRegion(region),
+		config.WithCredentialsProvider(credentials.NewStaticCredentialsProvider(accessKey, secretKey, "")),
+	)
+
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	awsClient := s3.NewFromConfig(cfg)
 	linkDriver, _ := LinkDriver.NewMongoLinkDriver(mongoConnectionString)
 	memberDriver, _ := member_driver.NewMongoMemberDriver(mongoConnectionString)
 	tokenHelper := helpers.NewTokenHelper(jwtSecretKey)
@@ -31,7 +52,7 @@ func main() {
 		MaxAge:           12 * 3600, // Maximum age in seconds
 	}))
 	appGroup := r.Group("/app")
-	appRouter := app_service.NewAppHandler(linkDriver, tokenHelper)
+	appRouter := app_service.NewAppHandler(awsClient, bucket, linkDriver, tokenHelper)
 	appRouter.Routes(appGroup)
 
 	memberGroup := r.Group("/member")
@@ -40,7 +61,7 @@ func main() {
 
 	r.POST("/redirect", appRouter.GetRedirect)
 
-	err := r.Run(":3000")
+	err = r.Run(":3000")
 	if err != nil {
 		fmt.Println(err)
 	}
