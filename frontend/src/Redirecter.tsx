@@ -73,11 +73,11 @@ const Redirecter: React.FC = () => {
 	if (!redirectLink) {
 		return <div>Loading...</div>;
 	}
-	        // Check if the URL starts with 'http://' or 'https://'
+	// Check if the URL starts with 'http://' or 'https://'
 	if (!/^https?:\/\//i.test(redirectLink)) {
 		setRedirectLink('https://' + redirectLink)
 	}
-			// Redirect to the formatted URL
+	// Redirect to the formatted URL
 	window.location.href = redirectLink;
 }
 
