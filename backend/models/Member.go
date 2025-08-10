@@ -5,6 +5,8 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
+// Member represents a member in the system.
+// It contains fields for ID, username, email, password, creation timestamp, and a token.
 type Member struct {
 	ID        primitive.ObjectID `bson:"_id"`
 	Username  string             `bson:"username"`
@@ -14,6 +16,8 @@ type Member struct {
 	Token     string             `bson:"token"`
 }
 
+// MemberSignedDetails represents the details of a signed member.
+// It includes the member's email, username, creation timestamp, and standard JWT claims.
 type MemberSignedDetails struct {
 	Email     string
 	Username  string

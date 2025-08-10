@@ -2,8 +2,9 @@ package helpers
 
 import (
 	"backend/models"
-	"github.com/dgrijalva/jwt-go"
 	"time"
+
+	"github.com/dgrijalva/jwt-go"
 )
 
 type TokenHelper struct {
@@ -16,6 +17,7 @@ func NewTokenHelper(secretKey string) *TokenHelper {
 	}
 }
 
+// GenerateToken creates a new JWT token with the provided email, username, createdAt timestamp, and expiration duration.
 func (t *TokenHelper) GenerateToken(email, username string, createdAt int64, expireAfter time.Duration) (string, error) {
 	claims := &models.MemberSignedDetails{
 		Email:     email,
@@ -30,6 +32,7 @@ func (t *TokenHelper) GenerateToken(email, username string, createdAt int64, exp
 	return token, err
 }
 
+// ValidateToken checks the validity of a JWT token and returns the claims if valid.
 func (t *TokenHelper) ValidateToken(tokenString string) (*models.MemberSignedDetails, error) {
 	token, err := jwt.ParseWithClaims(tokenString, &models.MemberSignedDetails{}, func(token *jwt.Token) (interface{}, error) {
 		return []byte(t.SecretKey), nil

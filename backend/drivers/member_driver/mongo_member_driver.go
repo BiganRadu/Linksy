@@ -3,9 +3,10 @@ package member_driver
 import (
 	"backend/models"
 	"context"
+	"time"
+
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
-	"time"
 )
 
 const (
@@ -18,6 +19,8 @@ type MongoMemberDriver struct {
 	nowFunc    func() time.Time
 }
 
+// NewMongoMemberDriver creates a new MongoMemberDriver instance
+// It connects to the MongoDB instance using the provided URI and initializes the collection.
 func NewMongoMemberDriver(URI string) (*MongoMemberDriver, error) {
 	serverAPI := options.ServerAPI(options.ServerAPIVersion1)
 	opts := options.Client().ApplyURI(URI).SetServerAPIOptions(serverAPI)
@@ -37,6 +40,7 @@ func NewMongoMemberDriver(URI string) (*MongoMemberDriver, error) {
 	}, nil
 }
 
+// CountMembersWithEmail counts the number of members with the specified email address.
 func (m *MongoMemberDriver) CountMembersWithEmail(Email string) (int, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
@@ -49,6 +53,7 @@ func (m *MongoMemberDriver) CountMembersWithEmail(Email string) (int, error) {
 	return int(count), nil
 }
 
+// GetMemberByEmail retrieves a member by their email address.
 func (m *MongoMemberDriver) GetMemberByEmail(Email string) (*models.Member, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
@@ -62,6 +67,7 @@ func (m *MongoMemberDriver) GetMemberByEmail(Email string) (*models.Member, erro
 	return &member, nil
 }
 
+// UpsertMember inserts a new member or updates an existing one based on their email address.
 func (m *MongoMemberDriver) UpsertMember(Member *models.Member) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
@@ -71,6 +77,7 @@ func (m *MongoMemberDriver) UpsertMember(Member *models.Member) error {
 	return err
 }
 
+// SetTokenForMember updates the token for a member identified by their email address.
 func (m *MongoMemberDriver) SetTokenForMember(Email, Token string) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
@@ -79,6 +86,7 @@ func (m *MongoMemberDriver) SetTokenForMember(Email, Token string) error {
 	return err
 }
 
+// DeleteMember removes a member from the database based on their email address.
 func (m *MongoMemberDriver) DeleteMember(Email string) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()

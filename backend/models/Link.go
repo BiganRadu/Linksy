@@ -1,5 +1,11 @@
 package models
 
+// Link represents a link model in the system.
+// It contains fields for the link's ID, title, icon, member email, access mode,
+// allowed and blacklisted IPs, access entries, referenced link, creation timestamp,
+// whether it has a QR code, and the QR code link.
+// The access mode can be one of the predefined constants, such as Default, IpWhiteList,
+// or IpBlackList, which determine how access to the link is controlled.
 type Link struct {
 	ID             string        `bson:"_id" json:"id"`
 	Title          string        `bson:"title" json:"title"`
@@ -15,6 +21,9 @@ type Link struct {
 	QRLink         string        `bson:"qr_link" json:"qr_link"`
 }
 
+// AccessEntry represents an entry in the access log for a link.
+// It contains fields for the hour of access, maps for country, device, and OS statistics,
+// and the total number of accesses during that hour.
 type AccessEntry struct {
 	HourStart  int64          `bson:"hour_start"`
 	CountryMap map[string]int `bson:"country"`

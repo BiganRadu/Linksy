@@ -6,17 +6,19 @@ import (
 	"context"
 	"crypto/rand"
 	"fmt"
-	"github.com/aws/aws-sdk-go-v2/aws"
-	"github.com/aws/aws-sdk-go-v2/service/s3"
-	"github.com/skip2/go-qrcode"
 	"io"
 	"math/big"
 	"net/http"
 	"os"
 	"regexp"
 	"strings"
+
+	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/service/s3"
+	"github.com/skip2/go-qrcode"
 )
 
+// RandomString generates a random alphanumeric string of the specified length.
 func RandomString(length int) string {
 	const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 	result := make([]byte, length)
@@ -27,6 +29,8 @@ func RandomString(length int) string {
 	return string(result)
 }
 
+// GetTitleAndIcon fetches the title and icon URL from a given webpage URL.
+// It returns the title, icon URL, and any error encountered during the process.
 func GetTitleAndIcon(url string) (string, string, error) {
 	resp, err := http.Get(url)
 	if err != nil {
@@ -72,6 +76,7 @@ func GetTitleAndIcon(url string) (string, string, error) {
 	return title, iconURL, nil
 }
 
+// IsIpAllowed checks if a given IP address is allowed to access a link based on the link's access mode and allowed IPs.
 func IsIpAllowed(Ip uint32, Link *models.Link) bool {
 	switch Link.AccessMode {
 	case constants.LinkAccessModes.Default:
@@ -94,11 +99,9 @@ func IsIpAllowed(Ip uint32, Link *models.Link) bool {
 	return false
 }
 
+// GenerateQRCode generates a QR code for the given text and saves it to the specified filename.
 func GenerateQRCode(text, filename string, size int) error {
-	wd, _ := os.Getwd()
-	fmt.Println("Current path: ", wd)
 	err := qrcode.WriteFile(text, qrcode.Medium, size, "/home/raduzew/CS2023-2027/GO/Linksy/backend/pictures/"+filename)
-	fmt.Println("QR code saved to", filename)
 	if err != nil {
 		fmt.Println("Failed to generate QR code: %v", err)
 		return err
@@ -106,6 +109,7 @@ func GenerateQRCode(text, filename string, size int) error {
 	return nil
 }
 
+// UploadToS3 uploads a file to an AWS S3 bucket and returns the URL of the uploaded object.
 func UploadToS3(awsClient *s3.Client, bucketName, objectKey, filePath string) (string, error) {
 	file, err := os.Open(filePath)
 	if err != nil {

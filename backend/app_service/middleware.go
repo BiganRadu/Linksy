@@ -2,6 +2,7 @@ package app_service
 
 import "github.com/gin-gonic/gin"
 
+// AuthenticationMiddleware is a middleware function that checks for the presence of an authentication token in the request headers.
 func (a *AppHandler) AuthenticationMiddleware(c *gin.Context) {
 	clientToken := c.Request.Header.Get("AuthToken")
 	if clientToken == "" {
