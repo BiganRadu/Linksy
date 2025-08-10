@@ -15,6 +15,7 @@ go_library(
 go_library(
     name = "app_service",
     srcs = [
+        "analyticsroutes.go",
         "handler.go",
         "middleware.go",
         "routes.go",
