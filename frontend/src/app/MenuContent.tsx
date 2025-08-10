@@ -26,7 +26,7 @@ function handleRedirect(path: string) {
 }
 
 const secondaryListItems = [
-  { text: 'Settings', icon: <SettingsRoundedIcon /> },
+  { text: 'Settings', icon: <SettingsRoundedIcon />, redirect: '/app/settings' },
 ];
 
 interface MenuContentProps {
@@ -55,7 +55,7 @@ export default function MenuContent({ selectedItem }: MenuContentProps) {
 			<List dense>
 				{secondaryListItems.map((item, index) => (
 					<ListItem key={index + mainListItems.length} disablePadding sx={{ display: 'block' }}>
-						<ListItemButton selected={index + mainListItems.length === selectedIndex}>
+						<ListItemButton selected={index + mainListItems.length === selectedIndex} onClick={() => handleRedirect(item.redirect)}>
 							<ListItemIcon>{item.icon}</ListItemIcon>
 							<ListItemText primary={item.text} />
 						</ListItemButton>

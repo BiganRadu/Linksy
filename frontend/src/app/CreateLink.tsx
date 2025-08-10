@@ -3,7 +3,7 @@ import { alpha } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
-import getSignInSideTheme from './theme/getSignInSideTheme';
+import getSignInSideTheme from '../theme/getSignInSideTheme';
 import TextField from '@mui/material/TextField';
 import { createTheme, ThemeProvider, PaletteMode } from '@mui/material/styles';
 import FormLabel from '@mui/material/FormLabel';

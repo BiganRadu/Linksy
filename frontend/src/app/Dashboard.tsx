@@ -3,7 +3,7 @@ import { alpha } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
-import getSignInSideTheme from './theme/getSignInSideTheme';
+import getSignInSideTheme from '../theme/getSignInSideTheme';
 import { createTheme, ThemeProvider, PaletteMode } from '@mui/material/styles';
 import SideMenu from './SideMenu';
 import MainGrid from './MainGrid';
@@ -12,13 +12,11 @@ import Cookies from 'js-cookie';
 
 export default function Dashboard(props: { disableCustomTheme?: boolean }) {
 	const [mode, setMode] = React.useState<PaletteMode>('light');
-	const [loggedIn, setLoggedIn] = React.useState(false);
 	const [username, setUsername] = React.useState('');
 	const [email, setEmail] = React.useState('');
 	const SignInSideTheme = createTheme(getSignInSideTheme(mode));
-	// This code only runs on the client side, to determine the system color preference
+
 	React.useEffect(() => {
-	  // Check if there is a preferred mode in localStorage
 	const fetchMemberInfo = async () => {
 
 		const authToken = Cookies.get('AuthToken');
@@ -29,13 +27,13 @@ export default function Dashboard(props: { disableCustomTheme?: boolean }) {
 		}).then(response => {
 			setUsername(response.data.username);
 			setEmail(response.data.email);
-			setLoggedIn(true);
 		}).catch(error => {
 			window.location.href = '/sign-in';
 		});
 	};
 
 	fetchMemberInfo();
+	  // Check if the user prefers dark mode
 	  const systemPrefersDark = window.matchMedia(
 		  '(prefers-color-scheme: dark)',
 		).matches;
