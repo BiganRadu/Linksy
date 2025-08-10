@@ -3,8 +3,9 @@ package member_service
 import (
 	"backend/drivers/member_driver"
 	"backend/helpers"
-	"github.com/gin-gonic/gin"
 	"time"
+
+	"github.com/gin-gonic/gin"
 )
 
 type MemberHandler struct {
@@ -23,8 +24,11 @@ func NewMemberHandler(memberDriver member_driver.MemberDriver, tokenHelper *help
 	}
 }
 
+// Routes sets up the routes for the member service.
 func (m *MemberHandler) Routes(group *gin.RouterGroup) {
 	group.POST("/register", m.Register)
+	group.POST("change-password", m.ChangePassword)
+	group.POST("change-name", m.ChangeName)
 	group.POST("/login", m.Login)
 	group.GET("/logout", m.Logout)
 }

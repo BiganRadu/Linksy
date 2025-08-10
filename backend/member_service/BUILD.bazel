@@ -11,6 +11,7 @@ go_library(
     deps = [
         "//drivers/member_driver",
         "//helpers",
+        "//member_service/models",
         "//models",
         "@com_github_gin_gonic_gin//:gin",
         "@org_golang_x_crypto//bcrypt",
