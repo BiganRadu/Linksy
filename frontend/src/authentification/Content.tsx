@@ -3,37 +3,37 @@ import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 
-import AutoFixHighRoundedIcon from '@mui/icons-material/AutoFixHighRounded';
-import ConstructionRoundedIcon from '@mui/icons-material/ConstructionRounded';
-import SettingsSuggestRoundedIcon from '@mui/icons-material/SettingsSuggestRounded';
-import ThumbUpAltRoundedIcon from '@mui/icons-material/ThumbUpAltRounded';
+import LinkRoundedIcon from '@mui/icons-material/LinkRounded';
+import QrCode2RoundedIcon from '@mui/icons-material/QrCode2Rounded';
+import BarChartRoundedIcon from '@mui/icons-material/BarChartRounded';
+import SecurityRoundedIcon from '@mui/icons-material/SecurityRounded';
 
-import { SitemarkIcon } from './CustomIcons';
+import { LinksyIcon } from './CustomIcons';
 
 const items = [
   {
-    icon: <SettingsSuggestRoundedIcon sx={{ color: 'text.secondary' }} />,
-    title: 'Adaptable performance',
+    icon: <LinkRoundedIcon sx={{ color: 'text.secondary' }} />,
+    title: 'Fast & reliable link shortening',
     description:
-      'Our product effortlessly adjusts to your needs, boosting efficiency and simplifying your tasks.',
+      'Quickly create short, memorable links that are easy to share and never let you down.',
   },
   {
-    icon: <ConstructionRoundedIcon sx={{ color: 'text.secondary' }} />,
-    title: 'Built to last',
+    icon: <QrCode2RoundedIcon sx={{ color: 'text.secondary' }} />,
+    title: 'Instant QR code generation',
     description:
-      'Experience unmatched durability that goes above and beyond with lasting investment.',
+      'Generate sleek, scannable QR codes for every link, perfect for print or offline sharing.',
   },
   {
-    icon: <ThumbUpAltRoundedIcon sx={{ color: 'text.secondary' }} />,
-    title: 'Great user experience',
+    icon: <BarChartRoundedIcon sx={{ color: 'text.secondary' }} />,
+    title: 'Detailed link analytics',
     description:
-      'Integrate our product into your routine with an intuitive and easy-to-use interface.',
+      'Track clicks, locations, and usage patterns with real-time analytics to measure your reach.',
   },
   {
-    icon: <AutoFixHighRoundedIcon sx={{ color: 'text.secondary' }} />,
-    title: 'Innovative functionality',
+    icon: <SecurityRoundedIcon sx={{ color: 'text.secondary' }} />,
+    title: 'Secure & private',
     description:
-      'Stay ahead with features that set new standards, addressing your evolving needs better than the rest.',
+      'Your links and analytics are protected with top-notch security to keep your data safe.',
   },
 ];
 
@@ -43,7 +43,7 @@ export default function Content() {
       sx={{ flexDirection: 'column', alignSelf: 'center', gap: 4, maxWidth: 450 }}
     >
       <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
-        <SitemarkIcon />
+        <LinksyIcon />
       </Box>
       {items.map((item, index) => (
         <Stack key={index} direction="row" sx={{ gap: 2 }}>

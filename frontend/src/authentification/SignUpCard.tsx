@@ -2,11 +2,8 @@ import * as React from 'react';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import MuiCard from '@mui/material/Card';
-import Checkbox from '@mui/material/Checkbox';
-import Divider from '@mui/material/Divider';
 import FormLabel from '@mui/material/FormLabel';
 import FormControl from '@mui/material/FormControl';
-import FormControlLabel from '@mui/material/FormControlLabel';
 import Link from '@mui/material/Link';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
@@ -14,9 +11,6 @@ import axios from 'axios';
 
 import { styled } from '@mui/material/styles';
 
-import ForgotPassword from './ForgotPassword';
-import { GoogleIcon, FacebookIcon, SitemarkIcon } from './CustomIcons';
-import { redirect } from 'react-router-dom';
 
 
 const Card = styled(MuiCard)(({ theme }) => ({
@@ -36,20 +30,8 @@ const Card = styled(MuiCard)(({ theme }) => ({
 		'hsla(220, 30%, 5%, 0.5) 0px 5px 15px 0px, hsla(220, 25%, 10%, 0.08) 0px 15px 35px -5px',
 	}),
   }));
-
-const SignUpError: React.FC<{ signUpError: boolean,	signUpErrorMessage: string }> = ({ signUpError, signUpErrorMessage }) => {
-	if(signUpError) {
-		return (
-			<Typography color="error" variant="body2">
-				{signUpErrorMessage}
-			</Typography>
-		);
-	} else {
-		return <></>
-	}
-}
   
-  export default function SignUpCard() {
+export default function SignUpCard() {
 	const [nameError, setNameError] = React.useState(false);
 	const [nameErrorMessage, setNameErrorMessage] = React.useState('');
 	const [emailError, setEmailError] = React.useState(false);
@@ -58,15 +40,6 @@ const SignUpError: React.FC<{ signUpError: boolean,	signUpErrorMessage: string }
 	const [passwordErrorMessage, setPasswordErrorMessage] = React.useState('');
 	const [signUpError, setSignUpError] = React.useState(false);
 	const [signUpErrorMessage, setSignUpErrorMessage] = React.useState('');
-	const [open, setOpen] = React.useState(false);
-  
-	const handleClickOpen = () => {
-	  setOpen(true);
-	};
-  
-	const handleClose = () => {
-	  setOpen(false);
-	};
   
 	const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
 	  event.preventDefault();
@@ -133,7 +106,6 @@ const SignUpError: React.FC<{ signUpError: boolean,	signUpErrorMessage: string }
 	return (
 	  <Card variant="outlined">
 		<Box sx={{ display: { xs: 'flex', md: 'none' } }}>
-		  <SitemarkIcon />
 		</Box>
 		<Typography
 		  component="h1"

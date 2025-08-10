@@ -8,7 +8,7 @@ import Content from './Content';
 export default function SignInSide() {
   const [mode, setMode] = React.useState<PaletteMode>('light');
   const SignInSideTheme = createTheme(getSignInSideTheme(mode));
-  // This code only runs on the client side, to determine the system color preference
+
   React.useEffect(() => {
     // Check if there is a preferred mode in localStorage
     const systemPrefersDark = window.matchMedia(
