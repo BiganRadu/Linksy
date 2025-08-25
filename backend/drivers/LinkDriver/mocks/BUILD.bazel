@@ -1,0 +1,12 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "mocks",
+    srcs = ["LinkDriver.go"],
+    importpath = "backend/drivers/LinkDriver/mocks",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//models",
+        "@com_github_stretchr_testify//mock",
+    ],
+)
