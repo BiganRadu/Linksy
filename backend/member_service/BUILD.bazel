@@ -1,4 +1,4 @@
-load("@io_bazel_rules_go//go:def.bzl", "go_library")
+load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
 
 go_library(
     name = "member_service",
@@ -16,5 +16,21 @@ go_library(
         "@com_github_gin_gonic_gin//:gin",
         "@org_golang_x_crypto//bcrypt",
         "@org_mongodb_go_mongo_driver//bson/primitive",
+    ],
+)
+
+go_test(
+    name = "member_service_test",
+    srcs = ["routes_test.go"],
+    embed = [":member_service"],
+    deps = [
+        "//drivers/member_driver/mocks",
+        "//helpers",
+        "//models",
+        "@com_github_gin_gonic_gin//:gin",
+        "@com_github_stretchr_testify//assert",
+        "@com_github_stretchr_testify//mock",
+        "@com_github_stretchr_testify//require",
+        "@org_golang_x_crypto//bcrypt",
     ],
 )

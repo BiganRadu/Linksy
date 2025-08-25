@@ -1,4 +1,4 @@
-load("@io_bazel_rules_go//go:def.bzl", "go_library")
+load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
 
 go_library(
     name = "helpers",
@@ -9,4 +9,10 @@ go_library(
         "//models",
         "@com_github_dgrijalva_jwt_go//:jwt-go",
     ],
+)
+
+go_test(
+    name = "helpers_test",
+    srcs = ["token_helper_test.go"],
+    embed = [":helpers"],
 )

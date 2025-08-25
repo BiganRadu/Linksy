@@ -1,16 +1,4 @@
-load("@io_bazel_rules_go//go:def.bzl", "go_library")
-
-go_library(
-    name = "service",
-    srcs = ["router.go"],
-    importpath = "backend/service",
-    visibility = ["//visibility:public"],
-    deps = [
-        "//drivers/LinkDriver",
-        "//service/models",
-        "@com_github_gin_gonic_gin//:gin",
-    ],
-)
+load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
 
 go_library(
     name = "app_service",
@@ -30,5 +18,24 @@ go_library(
         "//models",
         "@com_github_aws_aws_sdk_go_v2_service_s3//:s3",
         "@com_github_gin_gonic_gin//:gin",
+    ],
+)
+
+go_test(
+    name = "app_service_test",
+    srcs = [
+        "analyticsroutes_test.go",
+        "routes_test.go",
+    ],
+    embed = [":app_service"],
+    deps = [
+        "//app_service/models",
+        "//drivers/LinkDriver/mocks",
+        "//helpers",
+        "//models",
+        "@com_github_gin_gonic_gin//:gin",
+        "@com_github_stretchr_testify//assert",
+        "@com_github_stretchr_testify//mock",
+        "@com_github_stretchr_testify//require",
     ],
 )
