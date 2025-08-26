@@ -1,4 +1,4 @@
-load("@io_bazel_rules_go//go:def.bzl", "go_library")
+load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
 
 go_library(
     name = "LinkDriver",
@@ -13,5 +13,18 @@ go_library(
         "@org_mongodb_go_mongo_driver//bson",
         "@org_mongodb_go_mongo_driver//mongo",
         "@org_mongodb_go_mongo_driver//mongo/options",
+    ],
+)
+
+go_test(
+    name = "LinkDriver_test",
+    srcs = ["mongo_link_driver_test.go"],
+    embed = [":LinkDriver"],
+    deps = [
+        "//models",
+        "@com_github_stretchr_testify//require",
+        "@org_mongodb_go_mongo_driver//bson",
+        "@org_mongodb_go_mongo_driver//mongo",
+        "@org_mongodb_go_mongo_driver//mongo/integration/mtest",
     ],
 )
