@@ -63,7 +63,7 @@ func resetLinkMock(m *linkmocks.LinkDriver) {
 	m.Calls = nil
 }
 
-func TestGetAnalytics_ByChartType(t *testing.T) {
+func TestGetAnalyticsByChartType(t *testing.T) {
 	m := &linkmocks.LinkDriver{}
 	h := newTestAnalyticsHandler(m)
 	r := buildAnalyticsRouter(h)
@@ -232,7 +232,7 @@ func newDirectCtx(email string, start, end int64) (*gin.Context, *httptest.Respo
 	return c, w
 }
 
-func TestGetSessionAnalytics_Direct(t *testing.T) {
+func TestGetSessionAnalytics(t *testing.T) {
 	m := &linkmocks.LinkDriver{}
 	h := newTestAnalyticsHandler(m)
 	start := int64(1700000000)
@@ -254,7 +254,7 @@ func TestGetSessionAnalytics_Direct(t *testing.T) {
 	m.AssertExpectations(t)
 }
 
-func TestGetLinksAnalytics_Direct(t *testing.T) {
+func TestGetLinksAnalytics(t *testing.T) {
 	m := &linkmocks.LinkDriver{}
 	h := newTestAnalyticsHandler(m)
 	start := int64(1700000000)
@@ -289,7 +289,7 @@ func TestGetLinksAnalytics_Direct(t *testing.T) {
 	m.AssertExpectations(t)
 }
 
-func TestGetPlatformAnalytics_Direct(t *testing.T) {
+func TestGetPlatformAnalytics(t *testing.T) {
 	m := &linkmocks.LinkDriver{}
 	h := newTestAnalyticsHandler(m)
 	start := int64(1700000000)
@@ -315,7 +315,7 @@ func TestGetPlatformAnalytics_Direct(t *testing.T) {
 	m.AssertExpectations(t)
 }
 
-func TestGetCountryAnalytics_Direct(t *testing.T) {
+func TestGetCountryAnalytics(t *testing.T) {
 	m := &linkmocks.LinkDriver{}
 	h := newTestAnalyticsHandler(m)
 	start := int64(1700000000)

@@ -47,12 +47,15 @@ func main() {
 	r.Use(gin.Logger())
 	r.Use(gin.Recovery())
 	r.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"http://localhost:5173"}, // Allow your frontend's origin
+		AllowOrigins: []string{
+			"http://localhost:5173",
+			"http://linksyproject.s3-website.eu-north-1.amazonaws.com",
+		},
 		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization", "AuthToken"},
 		ExposeHeaders:    []string{"Content-Length"},
 		AllowCredentials: true,
-		MaxAge:           12 * 3600, // Maximum age in seconds
+		MaxAge:           12 * 3600,
 	}))
 	// Set up the routes for the app service
 	appGroup := r.Group("/app")
