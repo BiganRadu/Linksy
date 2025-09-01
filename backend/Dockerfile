@@ -15,7 +15,7 @@ RUN bazel build //:backend
 FROM debian:bookworm-slim
 
 WORKDIR /app
-COPY --from=builder /app/bazel-bin/backend ./server
+COPY --from=builder /app/bazel-bin/backend_/backend ./server
 
 EXPOSE 8080
 CMD ["./server"]
