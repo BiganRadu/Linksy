@@ -14,6 +14,10 @@ RUN bazel build //:backend
 # Stage 2: Minimal runtime image
 FROM debian:bookworm-slim
 
+# ✅ Install CA certificates so TLS connections (e.g. MongoDB Atlas) work
+RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates && \
+    rm -rf /var/lib/apt/lists/*
+
 WORKDIR /app
 COPY --from=builder /app/bazel-bin/backend_/backend ./server
 
