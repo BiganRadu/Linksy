@@ -51,7 +51,7 @@ export default function SignUpCard() {
 	  const password = data.get('password');
 	  const username = data.get('name');
 
-	axios.post('http://localhost:3000/member/register', {
+	axios.post('https://linksy-mhe5.onrender.com/member/register', {
 		email,
 		password,
 		username,

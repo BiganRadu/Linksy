@@ -89,7 +89,7 @@ export default function CustomizedDataGrid({startTimestamp, endTimestamp}: {star
 	React.useEffect(() => {
 		const fetchData = async () => {
 			const authToken = Cookies.get('AuthToken');
-				axios.get(`http://localhost:3000/app/analytics?chart_code=links&start=${startTimestamp}&end=${endTimestamp}`, {
+        axios.get(`https://linksy-mhe5.onrender.com/app/analytics?chart_code=links&start=${startTimestamp}&end=${endTimestamp}`, {
 				headers: {
 					AuthToken: authToken,
 				},

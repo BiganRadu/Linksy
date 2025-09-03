@@ -48,7 +48,7 @@ export default function SignInCard() {
     const data = new FormData(event.currentTarget);
 	const email = data.get('email');
 	const password = data.get('password');
-	axios.post('http://localhost:3000/member/login', { email, password })
+	axios.post('https://linksy-mhe5.onrender.com/member/login', { email, password })
 		.then(response => {
 			const token = response.data.token;
 			Cookies.set('AuthToken', token, { expires: 1 });

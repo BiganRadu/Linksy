@@ -18,6 +18,7 @@ import {
 	Typography,
 	Divider
  } from '@mui/material';
+import CircularProgress from '@mui/material/CircularProgress';
 
 export default function Dashboard(props: { disableCustomTheme?: boolean }) {
 	const [mode, setMode] = React.useState<PaletteMode>('light');
@@ -28,6 +29,7 @@ export default function Dashboard(props: { disableCustomTheme?: boolean }) {
 	const [confirmation, setConfirmation] = React.useState(false);
 	const [corfirmationId, setConfirmationId] = React.useState('');
 	const [shareDialog, setShareDialog] = React.useState(false);
+	const [loading, setLoading] = React.useState(true);
 	const SignInSideTheme = createTheme(getSignInSideTheme(mode));
 
 	const redirectToEditLink = (id: string) => {
@@ -45,12 +47,11 @@ export default function Dashboard(props: { disableCustomTheme?: boolean }) {
 
 	const submitDelete = () => {
 		const authToken = Cookies.get('AuthToken');
-		axios.delete(`http://localhost:3000/app/delete-qr?link_id=${corfirmationId}`, {
+		axios.delete(`https://linksy-mhe5.onrender.com/app/delete-qr?link_id=${corfirmationId}`, {
 			headers: {
 				AuthToken: authToken,
 			},
 		}).then(response => {
-			console.log(response);
 			window.location.reload();
 		}).catch(error => {
 			console.log(error);
@@ -59,9 +60,11 @@ export default function Dashboard(props: { disableCustomTheme?: boolean }) {
 
 	React.useEffect(() => {
 
+	setLoading(true);
+
 	const fetchMemberInfo = async () => {
 		const authToken = Cookies.get('AuthToken');
-		axios.get('http://localhost:3000/app/member-info', {
+		axios.get('https://linksy-mhe5.onrender.com/app/member-info', {
 			headers: {
 				AuthToken: authToken,
 			},
@@ -75,7 +78,7 @@ export default function Dashboard(props: { disableCustomTheme?: boolean }) {
 
 	const fetchMemberLinks = async () => {
 		const authToken = Cookies.get('AuthToken');
-		axios.get('http://localhost:3000/app/member-qrs', {
+		axios.get('https://linksy-mhe5.onrender.com/app/member-qrs', {
 			headers: {
 				AuthToken: authToken,
 			},
@@ -86,8 +89,8 @@ export default function Dashboard(props: { disableCustomTheme?: boolean }) {
 		});
 	};
 
-	fetchMemberInfo();
-	fetchMemberLinks();
+	Promise.allSettled([fetchMemberInfo(), fetchMemberLinks()])
+	  .finally(() => setLoading(false));
 
 	  const systemPrefersDark = window.matchMedia(
 		  '(prefers-color-scheme: dark)',
@@ -109,55 +112,63 @@ export default function Dashboard(props: { disableCustomTheme?: boolean }) {
 		};
 	}, [confirmation, shareDialog]);
 
-  return (
+	return (
 	<ThemeProvider theme={SignInSideTheme}>
 	  <CssBaseline enableColorScheme />
-	  <Box sx={{ display: 'flex' }}>
-		<SideMenu username={username} email={email} selectedItem='QR Codes'/>
-		<Box
-		  component="main"
-		  sx={(theme) => ({
-			flexGrow: 1,
-			backgroundColor: theme.vars
-			  ? `rgba(${theme.vars.palette.background.defaultChannel} / 1)`
-			  : alpha(theme.palette.background.default, 1),
-			overflow: 'auto',
-		  })}
-		>
-		  <Stack
-			spacing={2}
-			sx={{
-			  alignItems: 'center',
-			  mx: 3,
-			  pb: 5,
-			  mt: { xs: 8, md: 1 },
-			}}
-		  >
-			<Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width:'100%', maxWidth:'750px'}}>
-				<Typography variant="h3" component="div">
-					QRs Page
-				</Typography>
+	  <Box sx={{ display: 'flex', minHeight: '100vh' }}>
+		{loading ? (
+		  <Box sx={{ display: 'flex', flexGrow: 1, alignItems: 'center', justifyContent: 'center' }}>
+			<CircularProgress />
+		  </Box>
+		) : (
+		  <>
+			<SideMenu username={username} email={email} selectedItem='QR Codes'/>
+			<Box
+			  component="main"
+			  sx={(theme) => ({
+				flexGrow: 1,
+				backgroundColor: theme.vars
+				  ? `rgba(${theme.vars.palette.background.defaultChannel} / 1)`
+				  : alpha(theme.palette.background.default, 1),
+				overflow: 'auto',
+			  })}
+			>
+			  <Stack
+				spacing={2}
+				sx={{
+				  alignItems: 'center',
+				  mx: 3,
+				  pb: 5,
+				  mt: { xs: 8, md: 1 },
+				}}
+			  >
+				<Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width:'100%', maxWidth:'750px'}}>
+					<Typography variant="h3" component="div">
+						QRs Page
+					</Typography>
+				</Box>
+				<Divider />
+				{links === undefined || links === null ? (
+					<p>No QRs available</p>
+				) : (
+					links.map((link, index) => (
+						<QrCard 
+							key={index} 
+							title={link.title} 
+							icon_url={link.qr_picture} 
+							link_id={link.id} 
+							original_url={link.referenced_link} 
+							created_at={link.created_at} 
+							onEdit={() => redirectToEditLink(link.id)}
+							onDelete={() => handleDelete(link.id)}
+							onShare={handleShare}
+						/>
+					))
+				)}
+			  </Stack>
 			</Box>
-			<Divider />
-			{links === undefined || links === null ? (
-				<p>No QRs available</p>
-			) : (
-				links.map((link, index) => (
-					<QrCard 
-						key={index} 
-						title={link.title} 
-						icon_url={link.qr_picture} 
-						link_id={link.id} 
-						original_url={link.referenced_link} 
-						created_at={link.created_at} 
-						onEdit={() => redirectToEditLink(link.id)}
-						onDelete={() => handleDelete(link.id)}
-						onShare={handleShare}
-					/>
-				))
-			)}
-		  </Stack>
-		</Box>
+		  </>
+		)}
 	  </Box>
 	{confirmation && (
 		<Box

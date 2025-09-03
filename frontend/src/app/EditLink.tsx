@@ -84,7 +84,7 @@ export default function Dashboard(props: { disableCustomTheme?: boolean }) {
 
 		const authToken = Cookies.get('AuthToken');
 
-		axios.post('http://localhost:3000/app/update-link', {
+		axios.post('https://linksy-mhe5.onrender.com/app/update-link', {
 		'id': linkID,
 		'referenced_link' : referenced_link, 
 		'title' : title,
@@ -185,7 +185,7 @@ export default function Dashboard(props: { disableCustomTheme?: boolean }) {
 	const fetchMemberInfo = async () => {
 
 		const authToken = Cookies.get('AuthToken');
-		axios.get('http://localhost:3000/app/member-info', {
+		axios.get('https://linksy-mhe5.onrender.com/app/member-info', {
 			headers: {
 				AuthToken: authToken,
 			},
@@ -200,7 +200,7 @@ export default function Dashboard(props: { disableCustomTheme?: boolean }) {
 
 	const fetchLinkDetails = async () => {
 		const authToken = Cookies.get('AuthToken');
-		axios.get('http://localhost:3000/app/link?link_id=' + linkID, {
+		axios.get('https://linksy-mhe5.onrender.com/app/link?link_id=' + linkID, {
 			headers: {
 				AuthToken: authToken,
 			},

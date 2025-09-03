@@ -32,7 +32,7 @@ interface SideMenuInfo {
 
 const logout = async () => {
 	try {
-		const response = await axios.get('http://localhost:3000/member/logout', {
+    const response = await axios.get('https://linksy-mhe5.onrender.com/member/logout', {
 			headers: {
 				'AuthToken': Cookies.get('AuthToken')
 			}

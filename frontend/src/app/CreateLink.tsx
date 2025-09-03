@@ -82,7 +82,7 @@ export default function Dashboard(props: { disableCustomTheme?: boolean }) {
 
 		const authToken = Cookies.get('AuthToken');
 
-		axios.post('http://localhost:3000/app/create-link', { 
+		axios.post('https://linksy-mhe5.onrender.com/app/create-link', { 
 		'referenced_link' : referenced_link, 
 		'title' : title,
 		'allowed_ips' : allowed_ips,
@@ -189,7 +189,7 @@ export default function Dashboard(props: { disableCustomTheme?: boolean }) {
 	const fetchMemberInfo = async () => {
 
 		const authToken = Cookies.get('AuthToken');
-		axios.get('http://localhost:3000/app/member-info', {
+		axios.get('https://linksy-mhe5.onrender.com/app/member-info', {
 			headers: {
 				AuthToken: authToken,
 			},

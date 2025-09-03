@@ -12,6 +12,7 @@ import CustomCard from './CustomCard';
 import FacebookIcon from '@mui/icons-material/Facebook';
 import TwitterIcon from '@mui/icons-material/Twitter';
 import LinkedInIcon from '@mui/icons-material/LinkedIn';
+import CircularProgress from '@mui/material/CircularProgress';
 import {
 	Button,
 	IconButton,
@@ -29,6 +30,7 @@ export default function Dashboard(props: { disableCustomTheme?: boolean }) {
 	const [confirmation, setConfirmation] = React.useState(false);
 	const [corfirmationId, setConfirmationId] = React.useState('');
 	const [shareDialog, setShareDialog] = React.useState(false);
+	const [loading, setLoading] = React.useState(true);
 	const SignInSideTheme = createTheme(getSignInSideTheme(mode));
 
 	const redirectToCreateLink = () => {
@@ -50,7 +52,7 @@ export default function Dashboard(props: { disableCustomTheme?: boolean }) {
 
 	const submitDelete = () => {
 		const authToken = Cookies.get('AuthToken');
-		axios.delete(`http://localhost:3000/app/delete-link?link_id=${corfirmationId}`, {
+		axios.delete(`https://linksy-mhe5.onrender.com/app/delete-link?link_id=${corfirmationId}`, {
 			headers: {
 				AuthToken: authToken,
 			},
@@ -63,43 +65,40 @@ export default function Dashboard(props: { disableCustomTheme?: boolean }) {
 	}
 
 	React.useEffect(() => {
+	  const authToken = Cookies.get('AuthToken');
+	  setLoading(true);
 
-	const fetchMemberInfo = async () => {
-		const authToken = Cookies.get('AuthToken');
-		axios.get('http://localhost:3000/app/member-info', {
-			headers: {
-				AuthToken: authToken,
-			},
-		}).then(response => {
+	  const fetchMemberInfo = () =>
+		axios
+		  .get('https://linksy-mhe5.onrender.com/app/member-info', {
+			headers: { AuthToken: authToken },
+		  })
+		  .then((response) => {
 			setUsername(response.data.username);
 			setEmail(response.data.email);
 			setLoggedIn(true);
-		}).catch(error => {
+		  })
+		  .catch(() => {
 			window.location.href = '/sign-in';
-		});
-	};
+		  });
 
-	const fetchMemberLinks = async () => {
-		const authToken = Cookies.get('AuthToken');
-		axios.get('http://localhost:3000/app/member-links', {
-			headers: {
-				AuthToken: authToken,
-			},
-		}).then(response => {
+	  const fetchMemberLinks = () =>
+		axios
+		  .get('https://linksy-mhe5.onrender.com/app/member-links', {
+			headers: { AuthToken: authToken },
+		  })
+		  .then((response) => {
 			setLinks(response.data.links);
-		}).catch(error => {
+		  })
+		  .catch(() => {
 			setLinksError('Could not fetch links');
-		});
-	};
+		  });
 
-	fetchMemberInfo();
-	fetchMemberLinks();
+	  Promise.allSettled([fetchMemberInfo(), fetchMemberLinks()])
+		.finally(() => setLoading(false));
 
-	  const systemPrefersDark = window.matchMedia(
-		  '(prefers-color-scheme: dark)',
-		).matches;
-	setMode(systemPrefersDark ? 'dark' : 'light');
-
+	  const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+	  setMode(systemPrefersDark ? 'dark' : 'light');
 	}, []);
 
 	React.useEffect(() => {
@@ -115,59 +114,67 @@ export default function Dashboard(props: { disableCustomTheme?: boolean }) {
 		};
 	}, [confirmation, shareDialog]);
 
-  return (
-    <ThemeProvider theme={SignInSideTheme}>
-      <CssBaseline enableColorScheme />
-      <Box sx={{ display: 'flex' }}>
-		<SideMenu username={username} email={email} selectedItem='Links'/>
-        <Box
-          component="main"
-          sx={(theme) => ({
-            flexGrow: 1,
-            backgroundColor: theme.vars
-              ? `rgba(${theme.vars.palette.background.defaultChannel} / 1)`
-              : alpha(theme.palette.background.default, 1),
-            overflow: 'auto',
-          })}
-        >
-          <Stack
-            spacing={2}
-            sx={{
-              alignItems: 'center',
-              mx: 3,
-              pb: 5,
-              mt: { xs: 8, md: 1 },
-            }}
-          >
-			<Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width:'100%', maxWidth:'600px'}}>
-				<Typography variant="h3" component="div">
-					Links Page
-				</Typography>
-				<Button variant="contained" size="small" onClick={redirectToCreateLink}>
-					Create Link
-				</Button>
+	return (
+		<ThemeProvider theme={SignInSideTheme}>
+			<CssBaseline enableColorScheme />
+			<Box sx={{ display: 'flex', minHeight: '100vh' }}>
+				{loading ? (
+					<Box sx={{ display: 'flex', flexGrow: 1, alignItems: 'center', justifyContent: 'center' }}>
+						<CircularProgress />
+					</Box>
+				) : (
+					<>
+						<SideMenu username={username} email={email} selectedItem='Links'/>
+						<Box
+							component="main"
+							sx={(theme) => ({
+								flexGrow: 1,
+								backgroundColor: theme.vars
+									? `rgba(${theme.vars.palette.background.defaultChannel} / 1)`
+									: alpha(theme.palette.background.default, 1),
+								overflow: 'auto',
+							})}
+						>
+							<Stack
+								spacing={2}
+								sx={{
+									alignItems: 'center',
+									mx: 3,
+									pb: 5,
+									mt: { xs: 8, md: 1 },
+								}}
+							>
+							<Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width:'100%', maxWidth:'600px'}}>
+								<Typography variant="h3" component="div">
+									Links Page
+								</Typography>
+								<Button variant="contained" size="small" onClick={redirectToCreateLink}>
+									Create Link
+								</Button>
+							</Box>
+							<Divider />
+							{links === undefined || links === null ? (
+								<p>No links available</p>
+							) : (
+								links.map((link, index) => (
+									<CustomCard
+										key={index}
+										title={link.title}
+										icon_url={link.icon}
+										link_id={link.id}
+										original_url={link.referenced_link}
+										created_at={link.created_at}
+										onEdit={() => redirectToEditLink(link.id)}
+										onDelete={() => handleDelete(link.id)}
+										onShare={handleShare}
+									/>
+								))
+							)}
+							</Stack>
+						</Box>
+					</>
+				)}
 			</Box>
-			<Divider />
-			{links === undefined || links === null ? (
-				<p>No links available</p>
-			) : (
-				links.map((link, index) => (
-					<CustomCard 
-						key={index} 
-						title={link.title} 
-						icon_url={link.icon} 
-						link_id={link.id} 
-						original_url={link.referenced_link} 
-						created_at={link.created_at} 
-						onEdit={() => redirectToEditLink(link.id)}
-						onDelete={() => handleDelete(link.id)}
-						onShare={handleShare}
-					/>
-				))
-			)}
-          </Stack>
-        </Box>
-      </Box>
 	{confirmation && (
 		<Box
 			sx={{

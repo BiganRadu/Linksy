@@ -38,7 +38,7 @@ const Redirecter: React.FC = () => {
 			const { ip, country_name } = userData;
 
 			try {
-				const response = await fetch(`http://localhost:3000/redirect?link_id=${linkID}`, {
+				const response = await fetch(`https://linksy-mhe5.onrender.com/redirect?link_id=${linkID}`, {
 					method: 'POST',
 					headers: {
 						'Content-Type': 'application/json',

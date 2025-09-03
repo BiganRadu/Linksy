@@ -15,6 +15,7 @@ import {
 	Button,
 	Typography,
  } from '@mui/material';
+import CircularProgress from '@mui/material/CircularProgress';
 
 export default function Dashboard(props: { disableCustomTheme?: boolean }) {
 	const [mode, setMode] = React.useState<PaletteMode>('light');
@@ -23,6 +24,7 @@ export default function Dashboard(props: { disableCustomTheme?: boolean }) {
 	const [email, setEmail] = React.useState('');
 	const [passwordError, setPasswordError] = React.useState('');
 	const [alertMessage, setAlertMessage] = React.useState('');
+	const [loading, setLoading] = React.useState(true);
 	const SignInSideTheme = createTheme(getSignInSideTheme(mode));
 
 	const validateInputs = (oldPassword: HTMLInputElement, newPassword: HTMLInputElement, confirmNewPassword: HTMLInputElement) => {
@@ -49,7 +51,7 @@ export default function Dashboard(props: { disableCustomTheme?: boolean }) {
 			return;
 		}
 		const authToken = Cookies.get('AuthToken');
-		axios.post('http://localhost:3000/member/change-name', {
+		axios.post('https://linksy-mhe5.onrender.com/member/change-name', {
 			"new_name": nameInput.value,
 		}, {
 			headers: {
@@ -72,7 +74,7 @@ export default function Dashboard(props: { disableCustomTheme?: boolean }) {
 			return;
 		}
 		const authToken = Cookies.get('AuthToken');
-		axios.post('http://localhost:3000/member/change-password', {
+		axios.post('https://linksy-mhe5.onrender.com/member/change-password', {
 			"old_password": oldPassword.value,
 			"new_password": newPassword.value,
 		}, {
@@ -95,7 +97,8 @@ export default function Dashboard(props: { disableCustomTheme?: boolean }) {
 
 	const fetchMemberInfo = async () => {
 		const authToken = Cookies.get('AuthToken');
-		axios.get('http://localhost:3000/app/member-info', {
+		setLoading(true);
+		axios.get('https://linksy-mhe5.onrender.com/app/member-info', {
 			headers: {
 				AuthToken: authToken,
 			},
@@ -105,7 +108,7 @@ export default function Dashboard(props: { disableCustomTheme?: boolean }) {
 			setEmail(response.data.email);
 		}).catch(error => {
 			window.location.href = '/sign-in';
-		});
+		}).finally(() => setLoading(false));
 	};
 
 	fetchMemberInfo();
@@ -120,7 +123,13 @@ export default function Dashboard(props: { disableCustomTheme?: boolean }) {
   return (
 	<ThemeProvider theme={SignInSideTheme}>
 	  <CssBaseline enableColorScheme />
-	  <Box sx={{ display: 'flex' }}>
+	  <Box sx={{ display: 'flex', minHeight: '100vh' }}>
+		{loading ? (
+		  <Box sx={{ display: 'flex', flexGrow: 1, alignItems: 'center', justifyContent: 'center' }}>
+			<CircularProgress />
+		  </Box>
+		) : (
+		<>
 		<SideMenu username={username} email={email} selectedItem='Settings'/>
 		<Box
 		  component="main"
@@ -289,6 +298,8 @@ export default function Dashboard(props: { disableCustomTheme?: boolean }) {
 
 			</Box>
 		</Box>
+		</>
+		)}
 	  </Box>
 	</ThemeProvider>
   );

@@ -84,7 +84,7 @@ export default function ChartUserByCountry({chart_code, startTimestamp, endTimes
 	React.useEffect(() => {
 	const fetchData = async () => {
 		const authToken = Cookies.get('AuthToken');
-		axios.get(`http://localhost:3000/app/analytics?chart_code=${chart_code}&start=${startTimestamp}&end=${endTimestamp}`, {
+    axios.get(`https://linksy-mhe5.onrender.com/app/analytics?chart_code=${chart_code}&start=${startTimestamp}&end=${endTimestamp}`, {
 			headers: {
 				AuthToken: authToken,
 			},

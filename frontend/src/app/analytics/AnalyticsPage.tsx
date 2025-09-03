@@ -17,12 +17,14 @@ import SessionsChart from './SessionsChart';
 import RoundChart from './RoundChart';
 import CustomizedDataGrid from './CustomizedDataGrid';
 import dayjs from 'dayjs';
+import CircularProgress from '@mui/material/CircularProgress';
 
 export default function Dashboard(props: { disableCustomTheme?: boolean }) {
 	const [mode, setMode] = React.useState<PaletteMode>('light');
 	const [loggedIn, setLoggedIn] = React.useState(false);
 	const [username, setUsername] = React.useState('');
 	const [email, setEmail] = React.useState('');
+	const [loading, setLoading] = React.useState(true);
 	const SignInSideTheme = createTheme(getSignInSideTheme(mode));
 	let toDate = new Date();
 	let fromDate = new Date();
@@ -34,7 +36,8 @@ export default function Dashboard(props: { disableCustomTheme?: boolean }) {
 	const fetchMemberInfo = async () => {
 
 		const authToken = Cookies.get('AuthToken');
-		axios.get('http://localhost:3000/app/member-info', {
+		setLoading(true);
+		axios.get('https://linksy-mhe5.onrender.com/app/member-info', {
 			headers: {
 				AuthToken: authToken,
 			},
@@ -44,7 +47,7 @@ export default function Dashboard(props: { disableCustomTheme?: boolean }) {
 			setLoggedIn(true);
 		}).catch(error => {
 			window.location.href = '/sign-in';
-		});
+		}).finally(() => setLoading(false));
 	};
 
 	fetchMemberInfo();
@@ -58,7 +61,13 @@ export default function Dashboard(props: { disableCustomTheme?: boolean }) {
   return (
 	<ThemeProvider theme={SignInSideTheme}>
 	  <CssBaseline enableColorScheme />
-	  <Box sx={{ display: 'flex' }}>
+	  <Box sx={{ display: 'flex', minHeight: '100vh' }}>
+		{loading ? (
+		  <Box sx={{ display: 'flex', flexGrow: 1, alignItems: 'center', justifyContent: 'center' }}>
+			<CircularProgress />
+		  </Box>
+		) : (
+		<>
 		<SideMenu username={username} email={email} selectedItem='Analytics'/>
 		<Box
 		  component="main"
@@ -116,6 +125,8 @@ export default function Dashboard(props: { disableCustomTheme?: boolean }) {
         </Grid>
 		</Box>
 		</Box>
+		</>
+		)}
 	  </Box>
 	</ThemeProvider>
   );

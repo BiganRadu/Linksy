@@ -44,7 +44,7 @@ export default function SessionsChart({startTimestamp, endTimestamp}: {startTime
 		console.log(`Fetching data from ${startTimestamp} to ${endTimestamp}`);
   
 		const authToken = Cookies.get('AuthToken');
-		axios.get(`http://localhost:3000/app/analytics?chart_code=sessions&start=${startTimestamp}&end=${endTimestamp}`, {
+    axios.get(`https://linksy-mhe5.onrender.com/app/analytics?chart_code=sessions&start=${startTimestamp}&end=${endTimestamp}`, {
 			headers: {
 				AuthToken: authToken,
 			},
