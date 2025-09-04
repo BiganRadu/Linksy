@@ -27,7 +27,6 @@ type Link struct {
 type AccessEntry struct {
 	HourStart  int64          `bson:"hour_start"`
 	CountryMap map[string]int `bson:"country"`
-	DeviceMap  map[string]int `bson:"device"`
 	OsMap      map[string]int `bson:"os"`
 	Accesses   int            `bson:"accesses"`
 }
