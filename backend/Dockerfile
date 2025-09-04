@@ -21,5 +21,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates
 WORKDIR /app
 COPY --from=builder /app/bazel-bin/backend_/backend ./server
 
+RUN mkdir -p /app/pictures
+
 EXPOSE 8080
 CMD ["./server"]

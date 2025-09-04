@@ -264,12 +264,12 @@ func (a *AppHandler) DeleteQr(c *gin.Context) {
 
 // CreateQr generates a QR code for a link ID and uploads it to S3, returning the URL of the uploaded QR code.
 func (a *AppHandler) CreateQr(ID string) (string, error) {
-	err := helpers.GenerateQRCode("bit.ly/"+ID, ID+".png", 256)
+	err := helpers.GenerateQRCode("http://linksyproject.s3-website.eu-north-1.amazonaws.com/"+ID, ID+".png", 256)
 	if err != nil {
 		return "", err
 	}
 
-	return helpers.UploadToS3(a.awsClient, a.s3Bucket, "qrcodes/"+ID+".png", "/home/raduzew/CS2023-2027/GO/Linksy/backend/pictures/"+ID+".png")
+	return helpers.UploadToS3(a.awsClient, a.s3Bucket, "qrcodes/"+ID+".png", "/app/pictures/"+ID+".png")
 }
 
 // AddAccessEntry adds an access entry for a link based on the request data.

@@ -101,7 +101,7 @@ func IsIpAllowed(Ip uint32, Link *models.Link) bool {
 
 // GenerateQRCode generates a QR code for the given text and saves it to the specified filename.
 func GenerateQRCode(text, filename string, size int) error {
-	err := qrcode.WriteFile(text, qrcode.Medium, size, "/home/raduzew/CS2023-2027/GO/Linksy/backend/pictures/"+filename)
+	err := qrcode.WriteFile(text, qrcode.Medium, size, "/app/pictures/"+filename)
 	if err != nil {
 		fmt.Println("Failed to generate QR code: %v", err)
 		return err
