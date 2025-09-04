@@ -36,7 +36,7 @@ const formatTimestamp = (timestamp: number): string => {
 
 const CustomCard: React.FC<LinkCardInfo> = ({ title, link_id, original_url, icon_url, created_at, onDelete, onShare, onEdit}) => {
 	const copyToClipboard = () => {
-	  navigator.clipboard.writeText(`http://bit.ly/${link_id}`);
+	  navigator.clipboard.writeText(`http://linksyproject.s3-website.eu-north-1.amazonaws.com/${link_id}`);
 	};
   
 	return (
@@ -44,7 +44,7 @@ const CustomCard: React.FC<LinkCardInfo> = ({ title, link_id, original_url, icon
 		<CardContent>
 		  <Box sx={{ display: 'flex', alignItems: 'center' }}>
 			{/* Icon on the left */}
-			<Link href={`http://bit.ly/${link_id}`} target="_blank" underline="none" sx={{ outline: 'none', "::before": { content: '""', display: 'none',} }}>
+			<Link href={`http://linksyproject.s3-website.eu-north-1.amazonaws.com/${link_id}`} target="_blank" underline="none" sx={{ outline: 'none', "::before": { content: '""', display: 'none',} }}>
 				<Avatar
 					src={icon_url}
 					alt="Icon"
@@ -73,8 +73,8 @@ const CustomCard: React.FC<LinkCardInfo> = ({ title, link_id, original_url, icon
 				  </IconButton>
 				</Box>
 			  </Box>
-			  <Link href={`http://bit.ly/${link_id}`} target="_blank" sx={{ fontSize: 14, display: 'block', mb: 1, color: 'blue' }}>
-				bit.ly/{link_id}
+			  <Link href={`http://linksyproject.s3-website.eu-north-1.amazonaws.com/${link_id}`} target="_blank" sx={{ fontSize: 14, display: 'block', mb: 1, color: 'blue' }}>
+				linksyproject.s3-website.eu-north-1.amazonaws.com/{link_id}
 			  </Link>
 			  <Link href={original_url} target="_blank" sx={{ fontSize: 14, display: 'block' }}>
 				{original_url}

@@ -57,7 +57,6 @@ export default function Dashboard(props: { disableCustomTheme?: boolean }) {
 				AuthToken: authToken,
 			},
 		}).then(response => {
-			console.log(response);
 			window.location.reload();
 		}).catch(error => {
 			console.log(error);
