@@ -294,7 +294,6 @@ func (a *AppHandler) AddAccessEntry(req *internal_models.RedirectLinkRequest, Li
 		Link.AccessEntries = append(Link.AccessEntries, models.AccessEntry{
 			HourStart:  startOfHour,
 			CountryMap: map[string]int{},
-			DeviceMap:  map[string]int{},
 			OsMap:      map[string]int{},
 			Accesses:   0,
 		})
@@ -303,6 +302,5 @@ func (a *AppHandler) AddAccessEntry(req *internal_models.RedirectLinkRequest, Li
 
 	Link.AccessEntries[foundEntryIndex].Accesses++
 	Link.AccessEntries[foundEntryIndex].CountryMap[req.Country]++
-	Link.AccessEntries[foundEntryIndex].DeviceMap[req.Device]++
 	Link.AccessEntries[foundEntryIndex].OsMap[req.Os]++
 }
