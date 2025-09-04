@@ -6,16 +6,16 @@ import (
 	"context"
 	"crypto/rand"
 	"fmt"
-	"io"
 	"math/big"
 	"net/http"
+	"net/url"
 	"os"
-	"regexp"
 	"strings"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/skip2/go-qrcode"
+	"golang.org/x/net/html"
 )
 
 // RandomString generates a random alphanumeric string of the specified length.
@@ -31,8 +31,8 @@ func RandomString(length int) string {
 
 // GetTitleAndIcon fetches the title and icon URL from a given webpage URL.
 // It returns the title, icon URL, and any error encountered during the process.
-func GetTitleAndIcon(url string) (string, string, error) {
-	resp, err := http.Get(url)
+func GetTitleAndIcon(pageURL string) (string, string, error) {
+	resp, err := http.Get(pageURL)
 	if err != nil {
 		return "", "", err
 	}
@@ -42,38 +42,68 @@ func GetTitleAndIcon(url string) (string, string, error) {
 		return "", "", fmt.Errorf("failed to fetch page, status code: %d", resp.StatusCode)
 	}
 
-	body, err := io.ReadAll(resp.Body)
+	doc, err := html.Parse(resp.Body)
 	if err != nil {
 		return "", "", err
 	}
-	html := string(body)
 
-	// Extract the title using regex
-	titleRe := regexp.MustCompile(`(?i)<title>(.*?)</title>`)
-	titleMatches := titleRe.FindStringSubmatch(html)
-	title := "Unknown Title"
-	if len(titleMatches) > 1 {
-		title = titleMatches[1]
-	}
+	var title, icon string
+	var f func(*html.Node)
+	f = func(n *html.Node) {
+		if n.Type == html.ElementNode && n.Data == "title" && n.FirstChild != nil {
+			title = n.FirstChild.Data
+		}
 
-	// Extract the favicon URL using regex
-	iconRe := regexp.MustCompile(`(?i)<link[^>]+rel=["']?icon["']?[^>]+href=["']([^"']+)["']`)
-	iconMatches := iconRe.FindStringSubmatch(html)
-	iconURL := ""
-	if len(iconMatches) > 1 {
-		iconURL = iconMatches[1]
-
-		// Handle relative URLs
-		if !strings.HasPrefix(iconURL, "http") {
-			if strings.HasPrefix(iconURL, "//") {
-				iconURL = "https:" + iconURL
-			} else {
-				iconURL = url + "/" + strings.TrimLeft(iconURL, "/")
+		if n.Type == html.ElementNode && n.Data == "link" {
+			rel := ""
+			href := ""
+			for _, attr := range n.Attr {
+				switch strings.ToLower(attr.Key) {
+				case "rel":
+					rel = strings.ToLower(attr.Val)
+				case "href":
+					href = attr.Val
+				}
 			}
+			if (strings.Contains(rel, "icon") || strings.Contains(rel, "shortcut icon")) && href != "" && icon == "" {
+				icon = resolveURL(pageURL, href)
+			}
+		}
+
+		for c := n.FirstChild; c != nil; c = c.NextSibling {
+			f(c)
+		}
+	}
+	f(doc)
+
+	if icon == "" {
+		// fallback to /favicon.ico
+		parsed, err := url.Parse(pageURL)
+		if err == nil {
+			icon = parsed.Scheme + "://" + parsed.Host + "/favicon.ico"
 		}
 	}
 
-	return title, iconURL, nil
+	if title == "" {
+		title = "Unknown Title"
+	}
+
+	return title, icon, nil
+}
+
+func resolveURL(base, ref string) string {
+	u, err := url.Parse(ref)
+	if err != nil {
+		return ref
+	}
+	if u.IsAbs() {
+		return u.String()
+	}
+	baseURL, err := url.Parse(base)
+	if err != nil {
+		return ref
+	}
+	return baseURL.ResolveReference(u).String()
 }
 
 // IsIpAllowed checks if a given IP address is allowed to access a link based on the link's access mode and allowed IPs.
