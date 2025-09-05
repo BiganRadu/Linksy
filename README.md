@@ -50,3 +50,42 @@ It allows you to create, manage, and analyze your shortened links with an intuit
 **Storage**
 - QR code images are generated in the backend and stored in **AWS S3**
 
+---
+
+## 🚀 Deployment
+
+- **Frontend** is deployed as a static website on **AWS S3**
+- **Backend** is deployed as a web service on **Render**
+- MongoDB is used as a cloud database (Atlas)
+- QR code images are uploaded to **S3** buckets
+
+---
+
+## ⚙️ Technical Details
+
+### 🔗 Shortening Process
+1. User submits a URL in the frontend.
+2. Frontend sends a request to the backend (`POST /api/links`).
+3. Backend generates a unique short code and stores it in **MongoDB** along with metadata.
+4. If requested, a QR code is generated and uploaded to **AWS S3**.
+
+### 🖼 QR Code Handling
+- Generated using Go’s `qrcode` package.
+- Stored locally in a Docker container during runtime.
+- Then uploaded to **S3** for persistent storage.
+- Links page and QR page fetch them directly from **S3**.
+
+### 📊 Analytics Tracking
+- Each time a shortened link is accessed:
+    - Backend increments an **access entry** for that hour.
+    - Location (country), platform (OS), and timestamp are saved.
+- Stored in MongoDB in the `access_entries` array.
+- Data is aggregated for the **Analytics Page**:
+    - Daily access counts → Line chart.
+    - Country/platform distributions → Pie charts.
+    - Per-link breakdown → Stats table.  
+
+### 🔒 Authentication & Security
+- User accounts stored securely in MongoDB with hashed passwords.
+- Session tokens used for authentication in API requests.
+
