@@ -50,7 +50,3 @@ It allows you to create, manage, and analyze your shortened links with an intuit
 **Storage**
 - QR code images are generated in the backend and stored in **AWS S3**
 
----
-
-## 📂 Project Structure
-
